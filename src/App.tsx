@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import SideMenuLayout from './layouts/SideMenuLayout';
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
 
 function App() {
   return <RouterProvider router={router} />;
+
 }
 
 export default App;

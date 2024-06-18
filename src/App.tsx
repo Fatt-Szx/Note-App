@@ -12,11 +12,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <h1>Home</h1>,
+        element: <TaskSummary />, // Diperbarui
       },
       {
         path: '/',
-        element: <TaskSummary />, // Diperbarui
+        element: <h1>Home</h1>,
       },
       {
         path: 'task-list',

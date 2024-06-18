@@ -31,7 +31,7 @@ const TaskSummary = (): JSX.Element => {
         </h2>
       </div>
             {/* Tambahkan code di bawah */}
-            <div style={styles.links}>
+      <div style={styles.links}>
         <Link to="/task-list" style={styles.link}>
           See Your Task List
         </Link>
@@ -60,18 +60,16 @@ const styles: CSSProperties = {
     alignItems: 'center',
     marginBottom: '40px',
     width: '60%',
-  links: {
-    display: 'flex',
   },
-  link: {
-    padding: '16px',
-    marginRight: '24px',
-    backgroundColor: '#55ACC8',
-    color: '#fff',
-    borderRadius: '8px',
-    textDecoration: 'none',
-  },
+    link: {
+      padding: '16px',
+      marginRight: '24px',
+      backgroundColor: '#55ACC8',
+      color: '#fff',
+      borderRadius: '8px',
+      textDecoration: 'none',
+    },
 }
-}
+
 
 export default TaskSummary

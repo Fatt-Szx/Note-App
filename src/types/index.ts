@@ -2,7 +2,6 @@ export interface CSSProperties {
     [key: string]: React.CSSProperties
 
   }
-  
   // Ditambahkan
   export interface Task {
     id: number

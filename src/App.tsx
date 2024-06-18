@@ -1,6 +1,9 @@
+
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import SideMenuLayout from './layouts/SideMenuLayout';
+import { RecoilRoot } from 'recoil' // Ditambahkan
+import TaskSummary from './features/tasks/components/TaskSummary';
 
 const router = createBrowserRouter([
   {
@@ -12,6 +15,10 @@ const router = createBrowserRouter([
         element: <h1>Home</h1>,
       },
       {
+        path: '/',
+        element: <TaskSummary />, // Diperbarui
+      },
+      {
         path: 'task-list',
         element: <h1>Task List</h1>,
       },
@@ -19,12 +26,18 @@ const router = createBrowserRouter([
         path: 'task-progress',
         element: <h1>Task Progress</h1>,
       },
+      
     ],
   },
 ]);
 
-function App() {
-  return <RouterProvider router={router} />;
+function App(): JSX.Element {
+  return (
+    // Apit dengan RecoilRoot
+    <RecoilRoot>
+      <RouterProvider router={router} />
+    </RecoilRoot>
+  )
 }
 
 export default App;

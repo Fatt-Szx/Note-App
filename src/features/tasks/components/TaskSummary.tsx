@@ -1,8 +1,8 @@
 import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { completedTasksSelector, uncompletedTasksSelector, } from '../TaskSelectors'
-import type { Task, CSSProperties } from '../../../types'
 import { Link } from 'react-router-dom' // Ditambahkan
+import type { Task, CSSProperties } from '../../../types'
 
 const TaskSummary = (): JSX.Element => {
     // Mendapatkan tasks dari Selectors
@@ -15,14 +15,23 @@ const TaskSummary = (): JSX.Element => {
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>Summary of Your Tasks</h1>
+      {/* Diperbarui */}
       <div style={styles.list}>
-        ...
+        <span className="material-icons">check_circle</span>
+        <h2>
+          You have completed {completedTasks.length}{' '}
+          {completedTasks.length <= 1 ? 'task' : 'tasks'}
+        </h2>
       </div>
       <div style={styles.list}>
-        ...
+        <span className="material-icons">list</span>
+        <h2>
+          You still have {uncompletedTasks.length}{' '}
+          {uncompletedTasks.length <= 1 ? 'task' : 'tasks'} left
+        </h2>
       </div>
-      {/* Tambahkan code di bawah */}
-      <div style={styles.links}>
+            {/* Tambahkan code di bawah */}
+            <div style={styles.links}>
         <Link to="/task-list" style={styles.link}>
           See Your Task List
         </Link>
@@ -31,6 +40,7 @@ const TaskSummary = (): JSX.Element => {
         </Link>
       </div>
     </div>
+
   )
 }
 
@@ -50,18 +60,18 @@ const styles: CSSProperties = {
     alignItems: 'center',
     marginBottom: '40px',
     width: '60%',
-    links: {
-      display: 'flex',
-    },
-    link: {
-      padding: '16px',
-      marginRight: '24px',
-      backgroundColor: '#55ACC8',
-      color: '#fff',
-      borderRadius: '8px',
-      textDecoration: 'none',
-    },
-  }
+  links: {
+    display: 'flex',
+  },
+  link: {
+    padding: '16px',
+    marginRight: '24px',
+    backgroundColor: '#55ACC8',
+    color: '#fff',
+    borderRadius: '8px',
+    textDecoration: 'none',
+  },
+}
 }
 
 export default TaskSummary

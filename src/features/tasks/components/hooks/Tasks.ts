@@ -5,9 +5,17 @@ import { TASK_PROGRESS_ID } from '../../../../constants/app'
 
 interface useTaskActionType {
   completeTask: (taskId: number) => void
+  moveTaskCard: (taskId: number, directionNumber: 1 | -1) => void
+  // Ditambahkan
+  addTask: (
+    title: string,
+    detail: string,
+    dueDate: string,
+    progressOrder: number,
+  ) => void
 }
 
-export const useTasksAction = () => {
+export const useTasksAction = (): useTaskActionType => {
   const [tasks, setTasks] = useRecoilState<Task[]>(tasksState)
 
   const moveTaskCard = (taskId: number, direction: 'left' | 'right'): void => {
@@ -31,8 +39,26 @@ export const useTasksAction = () => {
     setTasks(updatedTasks)
   }
 
+    // Ditambahkan
+    const addTask = (
+      title: string,
+      detail: string,
+      dueDate: string,
+      progressOrder: number,
+    ): void => {
+      const newTask: Task = {
+        id: tasks.length + 1,
+        title,
+        detail,
+        dueDate,
+        progressOrder,
+      }
+      setTasks([...tasks, newTask])
+    }
+
   return {
     moveTaskCard,
     completeTask,
+    addTask,
   }
 }

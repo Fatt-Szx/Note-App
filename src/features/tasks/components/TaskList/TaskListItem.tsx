@@ -1,9 +1,28 @@
 import React from 'react'
 import type { Task, CSSProperties } from '../../../../types'
 import { TASK_PROGRESS_STATUS, TASK_PROGRESS_ID, } from '../../../../constants/app'
+import { useRecoilState } from 'recoil'  // Ditambahkan
+import { tasksState } from '../../TaskAtoms'  // Ditambahkan
 
 interface TaskListItemProps {
   task: Task
+}
+
+
+
+const getIconStyle = (progressOrder: number): React.CSSProperties => {
+  const color: '#55C89F' | '#C5C5C5' =
+    progressOrder === TASK_PROGRESS_ID.COMPLETED ? '#55C89F' : '#C5C5C5'
+
+  const cursor: 'default' | 'pointer' =
+    progressOrder === TASK_PROGRESS_ID.COMPLETED ? 'default' : 'pointer'
+
+  return {
+    color,
+    cursor,
+    fontSize: '28px',
+    marginRight: '6px',
+  }
 }
 
 const getProgressCategory = (progressOrder: number): string => {
@@ -23,10 +42,35 @@ const getProgressCategory = (progressOrder: number): string => {
 
 
 const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
+  
+    // Ditambahkan
+    const [tasks, setTasks] = useRecoilState<Task[]>(tasksState)
+
+    // Definisikan function ini
+    const completeTask = (taskId: number): void => {
+      const updatedTasks: Task[] = tasks.map((task) =>
+        task.id === taskId
+          ? { ...task, progressOrder: TASK_PROGRESS_ID.COMPLETED }
+          : task,
+      )
+      setTasks(updatedTasks)
+    }
+  
   return (
+    
+
     <div style={styles.tableBody}>
       <div style={styles.tableBodyTaskTitle}>
-        <span className="material-icons">check_circle</span>
+
+        <span
+          className="material-icons"
+          style={getIconStyle(task.progressOrder)}
+          onClick={(): void => {
+            completeTask(task.id) // Ditambahkan
+          }}
+        >
+          check_circle
+        </span>
         {task.title}
       </div>
       <div style={styles.tableBodyDetail}>{task.detail}</div>
@@ -43,6 +87,8 @@ const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
     </div>
   )
 }
+
+
 
 const styles: CSSProperties = {
   tableBody: {

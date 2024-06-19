@@ -3,7 +3,7 @@ import type { Task, CSSProperties } from '../../../../types'
 import { TASK_PROGRESS_STATUS, TASK_PROGRESS_ID, } from '../../../../constants/app'
 //import { useRecoilState } from 'recoil'  // Ditambahkan
 //import { tasksState } from '../../TaskAtoms'  // Ditambahkan
-import {useTasksAction} from '../../hooks/Tasks' // Ditambahkan
+import {useTasksAction} from '../hooks/Tasks'
 
 interface TaskListItemProps {
   task: Task
@@ -42,7 +42,7 @@ const getProgressCategory = (progressOrder: number): string => {
 }
 
 
-const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
+const TaskListItem = ({task}: TaskListItemProps): JSX.Element => {
   
   const {completeTask} = useTasksAction() // Ditambahkan
   

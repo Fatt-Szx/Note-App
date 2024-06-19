@@ -3,6 +3,11 @@ import type { Task, CSSProperties } from '../../../../types'
 import { TASK_PROGRESS_ID } from '../../../../constants/app'
 import { useRecoilState } from 'recoil'  // Ditambahkan
 import { tasksState } from '../../TaskAtoms'  // Ditambahkan
+import {useTasksAction} from '../../components/hooks/Tasks'
+
+interface TaskCardProps {
+  task: Task
+}
 
 interface TaskCardProps {
   task: Task
@@ -24,7 +29,6 @@ const getIconStyle = (progressOrder: number): React.CSSProperties => {
 
 const getArrowPositionStyle = (progressOrder: number): React.CSSProperties => {
   const justifyContentValue: 'flex-end' | 'space-between' =
-    // Raw data telah digantikan
     progressOrder === TASK_PROGRESS_ID.NOT_STARTED
       ? 'flex-end'
       : 'space-between'
@@ -34,50 +38,51 @@ const getArrowPositionStyle = (progressOrder: number): React.CSSProperties => {
   }
 }
 
-const TaskCard = ({task}: TaskCardProps): JSX.Element => {
-  const [tasks, setTasks] = useRecoilState<Task[]>(tasksState)
+const TaskCard = ({ task }: TaskCardProps): JSX.Element => {
+  const { moveTaskCard, completeTask } = useTasksAction()
 
-    // Definisikan function ini 
-  const completeTask = (taskId: number): void => {
-    const updatedTasks: Task[] = tasks.map((task) =>
-      task.id === taskId
-        ? { ...task, progressOrder: TASK_PROGRESS_ID.COMPLETED }
-        : task,
-    )
-    setTasks(updatedTasks)
-  }
-
-    return (
-        <div style={styles.taskCard}>
+  return (
+    <div style={styles.taskCard}>
       <div style={styles.taskIcons}>
         <div
           className="material-icons"
           style={getIconStyle(task.progressOrder)}
-          onClick={(): void => {
-            completeTask(task.id) // Ditambahkan
-          }}
+          onClick={(): void => completeTask(task.id)}
         >
           check_circle
         </div>
         <div className="material-icons" style={styles.menuIcon}>
           more_vert
         </div>
-          </div>
-          <p style={styles.taskTitle}>{task.title}</p>
-          <div>
-            <p>{task.detail}</p>
-          </div>
-          <div>
-            <p>Due on {task.dueDate}</p>
-          </div>
-          {task.progressOrder !== TASK_PROGRESS_ID.NOT_STARTED && ( 
-            <button className="material-icons">chevron_left</button> )}
-          {task.progressOrder !== TASK_PROGRESS_ID.COMPLETED && ( 
-            <button className="material-icons">chevron_right</button> )}
-          </div>
- 
-      )
-  }
+      </div>
+      <p style={styles.taskTitle}>{task.title}</p>
+      <div>
+        <p>{task.detail}</p>
+      </div>
+      <div>
+        <p>Due on {task.dueDate}</p>
+      </div>
+      <div style={getArrowPositionStyle(task.progressOrder)}>
+        {task.progressOrder !== TASK_PROGRESS_ID.NOT_STARTED && (
+          <button
+            className="material-icons"
+            onClick={(): void => moveTaskCard(task.id, 'left')}
+          >
+            chevron_left
+          </button>
+        )}
+        {task.progressOrder !== TASK_PROGRESS_ID.COMPLETED && (
+          <button
+            className="material-icons"
+            onClick={(): void => moveTaskCard(task.id, 'right')}
+          >
+            chevron_right
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
 
 const styles: CSSProperties = {
   taskCard: {

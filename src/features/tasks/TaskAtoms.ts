@@ -1,5 +1,4 @@
 import { atom } from 'recoil'
-import type { Task } from '../../types'
 import {AtomKeys} from '../../constants/recoilKeys'
 
 export const tasksState = atom({

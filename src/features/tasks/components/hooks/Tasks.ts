@@ -1,64 +1,79 @@
-import { useRecoilState } from 'recoil'
-import { tasksState } from '../../TaskAtoms'
-import type { Task } from '../../../../types'
-import { TASK_PROGRESS_ID } from '../../../../constants/app'
+// hooks/Tasks.ts
+import { useRecoilState } from 'recoil';
+import { tasksState } from '../../TaskAtoms';
+import type { Task } from '../../../../types';
+import { TASK_PROGRESS_ID } from '../../../../constants/app';
 
-interface useTaskActionType {
-  completeTask: (taskId: number) => void
-  moveTaskCard: (taskId: number, directionNumber: 1 | -1) => void
-  // Ditambahkan
-  addTask: (
-    title: string,
-    detail: string,
-    dueDate: string,
-    progressOrder: number,
-  ) => void
-}
+export const useTasksAction = () => {
+  const [tasks, setTasks] = useRecoilState(tasksState);
 
-export const useTasksAction = (): useTaskActionType => {
-  const [tasks, setTasks] = useRecoilState<Task[]>(tasksState)
+  // Helper function to generate a unique ID
+  const generateUniqueId = () => {
+    return tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1;
+  };
 
-  const moveTaskCard = (taskId: number, direction: 'left' | 'right'): void => {
-    const updatedTasks = tasks.map((task) => {
-      if (task.id === taskId) {
-        const newProgressOrder =
-          direction === 'left'
-            ? task.progressOrder - 1
-            : task.progressOrder + 1
-        return { ...task, progressOrder: newProgressOrder }
-      }
-      return task
-    })
-    setTasks(updatedTasks)
-  }
+  const addTask = (title: string, detail: string, dueDate: string, progressOrder: number): void => {
+    const newTask: Task = {
+      id: generateUniqueId(),
+      title,
+      detail,
+      dueDate,
+      progressOrder,
+    };
+    console.log('Adding new task:', newTask);
+    setTasks(prevTasks => [...prevTasks, newTask]);
+  };
 
-  const completeTask = (taskId: number): void => {
-    const updatedTasks: Task[] = tasks.map((task) =>
-      task.id === taskId ? { ...task, progressOrder: TASK_PROGRESS_ID.COMPLETED } : task
-    )
-    setTasks(updatedTasks)
-  }
+  const editTask = (id: number, updatedTask: Partial<Task>): void => {
+    console.log('editTask called with:', id, updatedTask);
+    setTasks(prevTasks => {
+      const updatedTasks = prevTasks.map(task => {
+        if (task.id === id) {
+          console.log('Updating task:', task);
+          return { ...task, ...updatedTask };
+        }
+        return task;
+      });
+      console.log('Updated tasks:', updatedTasks);
+      return updatedTasks;
+    });
+  };
 
-    // Ditambahkan
-    const addTask = (
-      title: string,
-      detail: string,
-      dueDate: string,
-      progressOrder: number,
-    ): void => {
-      const newTask: Task = {
-        id: tasks.length + 1,
-        title,
-        detail,
-        dueDate,
-        progressOrder,
-      }
-      setTasks([...tasks, newTask])
-    }
+  const deleteTask = (id: number): void => {
+    console.log('Deleting task with id:', id);
+    setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
+  };
+
+  const completeTask = (id: number): void => {
+    console.log('Completing task with id:', id);
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
+        task.id === id ? { ...task, progressOrder: TASK_PROGRESS_ID.COMPLETED } : task
+      )
+    );
+  };
+
+  const moveTaskCard = (id: number, direction: 'left' | 'right'): void => {
+    console.log('Moving task with id:', id, 'direction:', direction);
+    setTasks(prevTasks =>
+      prevTasks.map(task => {
+        if (task.id === id) {
+          const newProgressOrder =
+            direction === 'left'
+              ? task.progressOrder - 1
+              : task.progressOrder + 1;
+          return { ...task, progressOrder: newProgressOrder };
+        }
+        return task;
+      })
+    );
+  };
 
   return {
-    moveTaskCard,
-    completeTask,
     addTask,
-  }
-}
+    editTask,
+    deleteTask,
+    completeTask,
+    moveTaskCard,
+  };
+};

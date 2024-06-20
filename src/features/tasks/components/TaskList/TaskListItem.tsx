@@ -1,83 +1,117 @@
-import React from 'react'
-import type { Task, CSSProperties } from '../../../../types'
-import { TASK_PROGRESS_STATUS, TASK_PROGRESS_ID, } from '../../../../constants/app'
-//import { useRecoilState } from 'recoil'  // Ditambahkan
-//import { tasksState } from '../../TaskAtoms'  // Ditambahkan
-import {useTasksAction} from '../hooks/Tasks'
-
-interface TaskListItemProps {
-  task: Task
-}
-
-
+import React, { useState } from 'react';
+import { useTasksAction } from '../hooks/Tasks'; // Pastikan ini diimpor dari lokasi yang tepat
+import TaskMenu from '../shared/TaskMenu'; // Pastikan ini diimpor jika digunakan
+import { TASK_MODAL_TYPE, TASK_PROGRESS_ID, TASK_PROGRESS_STATUS } from '../../../../constants/app'; // Pastikan ini diimpor dari lokasi yang tepat
+import type { Task, CSSProperties } from '../../../../types'; // Pastikan ini diimpor dari lokasi yang tepat
+import TaskModal from '../shared/TaskModal';
 
 const getIconStyle = (progressOrder: number): React.CSSProperties => {
   const color: '#55C89F' | '#C5C5C5' =
-    progressOrder === TASK_PROGRESS_ID.COMPLETED ? '#55C89F' : '#C5C5C5'
+    progressOrder === TASK_PROGRESS_ID.COMPLETED ? '#55C89F' : '#C5C5C5';
 
   const cursor: 'default' | 'pointer' =
-    progressOrder === TASK_PROGRESS_ID.COMPLETED ? 'default' : 'pointer'
+    progressOrder === TASK_PROGRESS_ID.COMPLETED ? 'default' : 'pointer';
 
   return {
     color,
     cursor,
     fontSize: '28px',
     marginRight: '6px',
-  }
-}
+  };
+};
 
 const getProgressCategory = (progressOrder: number): string => {
   switch (progressOrder) {
     case TASK_PROGRESS_ID.NOT_STARTED:
-      return TASK_PROGRESS_STATUS.NOT_STARTED
+      return TASK_PROGRESS_STATUS.NOT_STARTED;
     case TASK_PROGRESS_ID.IN_PROGRESS:
-      return TASK_PROGRESS_STATUS.IN_PROGRESS
+      return TASK_PROGRESS_STATUS.IN_PROGRESS;
     case TASK_PROGRESS_ID.WAITING:
-      return TASK_PROGRESS_STATUS.WAITING
+      return TASK_PROGRESS_STATUS.WAITING;
     case TASK_PROGRESS_ID.COMPLETED:
-      return TASK_PROGRESS_STATUS.COMPLETED
+      return TASK_PROGRESS_STATUS.COMPLETED;
     default:
-      return TASK_PROGRESS_STATUS.NOT_STARTED
+      return TASK_PROGRESS_STATUS.NOT_STARTED;
   }
+};
+
+interface TaskListItemProps {
+  task: Task;
 }
 
+const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
+  const { completeTask, moveTaskCard, deleteTask, editTask } = useTasksAction();
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
-const TaskListItem = ({task}: TaskListItemProps): JSX.Element => {
-  
-  const {completeTask} = useTasksAction() // Ditambahkan
-  
+  const handleCompleteTask = () => {
+    completeTask(task.id); // Memanggil completeTask saat ikon task selesai diklik
+  };
+
+  const handleMenuOpen = () => {
+    setIsMenuOpen(true); // Mengatur isMenuOpen menjadi true saat ikon menu diklik
+  };
+
+  const handleEdit = (): void => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleDelete = (): void => {
+    deleteTask(task.id);
+    setIsMenuOpen(false);
+  };
+
+  const handleSaveEdit = (updatedTask: Partial<Task>): void => {
+    editTask(task.id, updatedTask);
+    setIsEditModalOpen(false);
+  };
+
   return (
-    
     <div style={styles.tableBody}>
       <div style={styles.tableBodyTaskTitle}>
-
-      <span
+        <span
           className="material-icons"
           style={getIconStyle(task.progressOrder)}
-          onClick={() => {
-            completeTask(task.id)
-          }}
+          onClick={handleCompleteTask} // Menghubungkan handleCompleteTask dengan onClick
         >
           check_circle
         </span>
         {task.title}
       </div>
-        <div style={styles.tableBodyDetail}>{task.detail}</div>
-        <div style={styles.tableBodyDueDate}>{task.dueDate}</div>
-        
-        <div style={styles.tableBodyprogress}>
+      <div style={styles.tableBodyDetail}>{task.detail}</div>
+      <div style={styles.tableBodyDueDate}>{task.dueDate}</div>
+      <div style={styles.tableBodyprogress}>
         {getProgressCategory(task.progressOrder)}
       </div>
       <div>
-        <span className="material-icons" style={styles.menuIcon}>
+        <span
+        className="material-icons"
+        style={styles.menuIcon}
+        onClick={(): void => setIsMenuOpen(true)}
+      >
           more_horiz
         </span>
       </div>
-    </div>
-  )
-}
-
-
+      {isMenuOpen && (
+        <TaskMenu
+          setIsMenuOpen={setIsMenuOpen}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
+            {isEditModalOpen && (
+        <TaskModal
+          headingTitle={`Edit Task`}
+          type={TASK_MODAL_TYPE.EDIT}
+          setIsModalOpen={setIsEditModalOpen}
+          defaultProgressOrder={task.progressOrder}
+          task={task}
+          onSave={handleSaveEdit}
+        />
+      )}
+      </div>
+  );
+};
 
 const styles: CSSProperties = {
   tableBody: {
@@ -113,6 +147,6 @@ const styles: CSSProperties = {
   menuIcon: {
     cursor: 'pointer',
   },
-}
+};
 
-export default TaskListItem
+export default TaskListItem;

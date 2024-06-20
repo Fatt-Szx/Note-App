@@ -1,40 +1,51 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   TASK_PROGRESS_ID,
   TASK_PROGRESS_STATUS,
   TASK_MODAL_TYPE,
-} from '../../../../constants/app'
-import type { CSSProperties } from '../../../../types'
-import type { Dispatch, SetStateAction } from 'react'
-import { useTasksAction } from '../hooks/Tasks'
+} from '../../../../constants/app';
+import type { CSSProperties } from '../../../../types';
+import type { Dispatch, SetStateAction } from 'react';
+import { useTasksAction } from '../hooks/Tasks';
+import type { Task } from '../../../../types';
 
 interface TaskFormProps {
-  type: string
-  defaultProgressOrder: number
-  setIsModalOpen: Dispatch<SetStateAction<boolean>>
+  type: string;
+  defaultProgressOrder: number;
+  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+  task?: Task; // optional task for editing
 }
 
-const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen }: TaskFormProps): JSX.Element => {
-  const [title, setTitle] = useState<string>('')
-  const [detail, setDetail] = useState<string>('')
-  const [dueDate, setDueDate] = useState<string>('')
-  const [progressOrder, setProgressOrder] = useState<number>(
-    defaultProgressOrder,
-  )
+const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen, task }: TaskFormProps): JSX.Element => {
+  const [title, setTitle] = useState<string>(task?.title || '');
+  const [detail, setDetail] = useState<string>(task?.detail || '');
+  const [dueDate, setDueDate] = useState<string>(task?.dueDate || '');
+  const [progressOrder, setProgressOrder] = useState<number>(task?.progressOrder || defaultProgressOrder);
 
-  const { addTask } = useTasksAction()
+  const { addTask, editTask } = useTasksAction();
+
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title);
+      setDetail(task.detail);
+      setDueDate(task.dueDate);
+      setProgressOrder(task.progressOrder || defaultProgressOrder);
+    }
+  }, [task, defaultProgressOrder]);
 
   const handleSubmit = (): void => {
     if (type === TASK_MODAL_TYPE.ADD) {
-      addTask(title, detail, dueDate, progressOrder)
-      setIsModalOpen(false)  // Tutup modal setelah submit
+      addTask(title, detail, dueDate, progressOrder);
+    } else if (type === TASK_MODAL_TYPE.EDIT && task) {
+      editTask(task.id, { title, detail, dueDate, progressOrder });
     }
-  }
+    setIsModalOpen(false);
+  };
 
   return (
     <form style={styles.form}>
       <div style={styles.formItem}>
-        <label>Title：</label>
+        <label>Title:</label>
         <input
           type="text"
           value={title}
@@ -43,7 +54,7 @@ const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen }: TaskFormProps)
         />
       </div>
       <div style={styles.formItem}>
-        <label>Detail：</label>
+        <label>Detail:</label>
         <textarea
           value={detail}
           onChange={(e): void => setDetail(e.target.value)}
@@ -51,7 +62,7 @@ const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen }: TaskFormProps)
         />
       </div>
       <div style={styles.formItem}>
-        <label>Due Date：</label>
+        <label>Due Date:</label>
         <input
           type="date"
           value={dueDate}
@@ -60,7 +71,7 @@ const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen }: TaskFormProps)
         />
       </div>
       <div style={styles.formItem}>
-        <label>Progress：</label>
+        <label>Progress:</label>
         <select
           style={styles.formInput}
           value={progressOrder}
@@ -84,8 +95,8 @@ const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen }: TaskFormProps)
         Submit
       </button>
     </form>
-  )
-}
+  );
+};
 
 const styles: CSSProperties = {
   form: {
@@ -100,10 +111,16 @@ const styles: CSSProperties = {
   formInput: {
     height: '40px',
     fontSize: '20px',
+    padding: '8px',
+    borderRadius: '4px',
+    border: '1px solid #ccc',
   },
   formTextArea: {
     height: '80px',
     fontSize: '20px',
+    padding: '8px',
+    borderRadius: '4px',
+    border: '1px solid #ccc',
   },
   button: {
     backgroundColor: '#55C89F',
@@ -112,7 +129,8 @@ const styles: CSSProperties = {
     padding: '12px 24px',
     border: 'none',
     borderRadius: '4px',
+    cursor: 'pointer',
   },
-}
+};
 
-export default TaskForm
+export default TaskForm;

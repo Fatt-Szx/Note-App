@@ -41,13 +41,12 @@ const TaskList = (): JSX.Element => {
         })}
       </div>
       {isModalOpen && (
-      <TaskModal
-        headingTitle="Add your task"
-        type={TASK_MODAL_TYPE.ADD} // Ditambahkan
-        setIsModalOpen={setIsModalOpen}
-        defaultProgressOrder={TASK_PROGRESS_ID.NOT_STARTED}
-      />
-  )}
+        <TaskModal
+          headingTitle="Add your task"
+          setIsModalOpen={setIsModalOpen}
+          defaultProgressOrder={TASK_PROGRESS_ID.NOT_STARTED}
+        />
+      )}
     </div>
   )
 }

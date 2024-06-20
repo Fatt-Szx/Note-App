@@ -36,7 +36,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ columnTitle, tasks, progressOrd
           headingTitle={`Add ${columnTitle} Task`}
           type={TASK_MODAL_TYPE.ADD}
           setIsModalOpen={setIsModalOpen}
-          defaultProgressOrder={progressOrder}
+          defaultProgressOrder={TASK_PROGRESS_ID.NOT_STARTED}
         />
       )}
     </div>

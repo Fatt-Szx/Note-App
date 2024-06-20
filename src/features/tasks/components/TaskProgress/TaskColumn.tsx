@@ -1,9 +1,10 @@
-// components/TaskColumn.tsx
 import React, { useState } from 'react';
 import TaskCard from './TaskCard';
 import TaskModal from '../shared/TaskModal';
 import { TASK_MODAL_TYPE, TASK_PROGRESS_ID } from '../../../../constants/app';
 import type { Task } from '../../../../types';
+import { modalState } from '../../../../state/globalState';
+import { useTasksAction } from '../hooks/Tasks';
 
 interface TaskColumnProps {
   columnTitle: string;
@@ -13,9 +14,19 @@ interface TaskColumnProps {
 
 const TaskColumn: React.FC<TaskColumnProps> = ({ columnTitle, tasks, progressOrder }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const { addTask } = useTasksAction();
 
   const handleOpenModal = (): void => {
     setIsModalOpen(true);
+  };
+
+  const handleCloseModal = (): void => {
+    setIsModalOpen(false);
+  };
+
+  const handleSaveTask = (newTask: Task): void => {
+    addTask(newTask);
+    handleCloseModal();
   };
 
   return (
@@ -37,13 +48,14 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ columnTitle, tasks, progressOrd
           type={TASK_MODAL_TYPE.ADD}
           setIsModalOpen={setIsModalOpen}
           defaultProgressOrder={TASK_PROGRESS_ID.NOT_STARTED}
+          onSave={handleSaveTask}
         />
       )}
     </div>
   );
 };
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   categoryColumn: {
     width: '300px',
     border: '1px solid #ccc',

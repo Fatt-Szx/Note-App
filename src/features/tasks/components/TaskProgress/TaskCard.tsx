@@ -4,6 +4,7 @@ import { TASK_PROGRESS_ID, TASK_MODAL_TYPE } from '../../../../constants/app';
 import { useTasksAction } from '../hooks/Tasks';
 import TaskMenu from '../shared/TaskMenu';
 import TaskModal from '../shared/TaskModal';
+import { modalState, menuState } from '../../../../state/globalState';
 
 interface TaskCardProps {
   task: Task;
@@ -36,6 +37,14 @@ const TaskCard = ({ task }: TaskCardProps): JSX.Element => {
   const { completeTask, moveTaskCard, deleteTask, editTask } = useTasksAction();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+
+  const openModal = () => {
+    modalState.setModal({ isOpen: true, modalType: TASK_MODAL_TYPE.ADD, taskId: null });
+  };
+
+  const closeModal = () => {
+    modalState.setModal({ isOpen: false, modalType: null, taskId: null });
+  };
 
   const handleEdit = (): void => {
     setIsEditModalOpen(true);
@@ -115,7 +124,7 @@ const TaskCard = ({ task }: TaskCardProps): JSX.Element => {
   );
 };
 
-const styles: CSSProperties = {
+const styles: Record<string, React.CSSProperties> = {
   taskCard: {
     backgroundColor: '#C7EFD0',
     borderRadius: '12px',

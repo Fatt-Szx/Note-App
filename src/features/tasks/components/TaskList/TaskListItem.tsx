@@ -1,23 +1,16 @@
-import React, { useState } from 'react';
-import { useTasksAction } from '../hooks/Tasks'; // Pastikan ini diimpor dari lokasi yang tepat
-import TaskMenu from '../shared/TaskMenu'; // Pastikan ini diimpor jika digunakan
-import { TASK_MODAL_TYPE, TASK_PROGRESS_ID, TASK_PROGRESS_STATUS } from '../../../../constants/app'; // Pastikan ini diimpor dari lokasi yang tepat
-import type { Task, CSSProperties } from '../../../../types'; // Pastikan ini diimpor dari lokasi yang tepat
+import React from 'react';
+import { useRecoilState } from 'recoil';
+import { useTasksAction } from '../hooks/Tasks';
+import TaskMenu from '../shared/TaskMenu';
 import TaskModal from '../shared/TaskModal';
+import { modalState, menuState } from '../../../../state/globalState';
+import { TASK_MODAL_TYPE, TASK_PROGRESS_ID, TASK_PROGRESS_STATUS } from '../../../../constants/app';
+import type { Task, CSSProperties } from '../../../../types';
 
 const getIconStyle = (progressOrder: number): React.CSSProperties => {
-  const color: '#55C89F' | '#C5C5C5' =
-    progressOrder === TASK_PROGRESS_ID.COMPLETED ? '#55C89F' : '#C5C5C5';
-
-  const cursor: 'default' | 'pointer' =
-    progressOrder === TASK_PROGRESS_ID.COMPLETED ? 'default' : 'pointer';
-
-  return {
-    color,
-    cursor,
-    fontSize: '28px',
-    marginRight: '6px',
-  };
+  const color = progressOrder === TASK_PROGRESS_ID.COMPLETED ? '#55C89F' : '#C5C5C5';
+  const cursor = progressOrder === TASK_PROGRESS_ID.COMPLETED ? 'default' : 'pointer';
+  return { color, cursor, fontSize: '28px', marginRight: '6px' };
 };
 
 const getProgressCategory = (progressOrder: number): string => {
@@ -40,30 +33,29 @@ interface TaskListItemProps {
 }
 
 const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
-  const { completeTask, moveTaskCard, deleteTask, editTask } = useTasksAction();
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const { completeTask, deleteTask, editTask } = useTasksAction();
+  const [modal, setModal] = useRecoilState(modalState);
+  const [menu, setMenu] = useRecoilState(menuState);
 
-  const handleCompleteTask = () => {
-    completeTask(task.id); // Memanggil completeTask saat ikon task selesai diklik
-  };
+  const handleCompleteTask = () => completeTask(task.id);
 
   const handleMenuOpen = () => {
-    setIsMenuOpen(true); // Mengatur isMenuOpen menjadi true saat ikon menu diklik
+    setMenu({ isOpen: true, taskId: task.id });
   };
 
   const handleEdit = (): void => {
-    setIsEditModalOpen(true);
+    setModal({ isOpen: true, modalType: TASK_MODAL_TYPE.EDIT, taskId: task.id });
+    setMenu({ isOpen: false, taskId: null });
   };
 
   const handleDelete = (): void => {
     deleteTask(task.id);
-    setIsMenuOpen(false);
+    setMenu({ isOpen: false, taskId: null });
   };
 
   const handleSaveEdit = (updatedTask: Partial<Task>): void => {
     editTask(task.id, updatedTask);
-    setIsEditModalOpen(false);
+    setModal({ isOpen: false, modalType: null, taskId: null });
   };
 
   return (
@@ -72,7 +64,7 @@ const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
         <span
           className="material-icons"
           style={getIconStyle(task.progressOrder)}
-          onClick={handleCompleteTask} // Menghubungkan handleCompleteTask dengan onClick
+          onClick={handleCompleteTask}
         >
           check_circle
         </span>
@@ -80,36 +72,30 @@ const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
       </div>
       <div style={styles.tableBodyDetail}>{task.detail}</div>
       <div style={styles.tableBodyDueDate}>{task.dueDate}</div>
-      <div style={styles.tableBodyprogress}>
-        {getProgressCategory(task.progressOrder)}
-      </div>
+      <div style={styles.tableBodyprogress}>{getProgressCategory(task.progressOrder)}</div>
       <div>
-        <span
-        className="material-icons"
-        style={styles.menuIcon}
-        onClick={(): void => setIsMenuOpen(true)}
-      >
+        <span className="material-icons" style={styles.menuIcon} onClick={handleMenuOpen}>
           more_horiz
         </span>
       </div>
-      {isMenuOpen && (
+      {menu.isOpen && menu.taskId === task.id && (
         <TaskMenu
-          setIsMenuOpen={setIsMenuOpen}
+          setIsMenuOpen={() => setMenu({ isOpen: false, taskId: null })}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
       )}
-            {isEditModalOpen && (
+      {modal.isOpen && modal.taskId === task.id && modal.modalType === TASK_MODAL_TYPE.EDIT && (
         <TaskModal
-          headingTitle={`Edit Task`}
+          headingTitle="Edit Task"
           type={TASK_MODAL_TYPE.EDIT}
-          setIsModalOpen={setIsEditModalOpen}
+          setIsModalOpen={() => setModal({ isOpen: false, modalType: null, taskId: null })}
           defaultProgressOrder={task.progressOrder}
           task={task}
           onSave={handleSaveEdit}
         />
       )}
-      </div>
+    </div>
   );
 };
 

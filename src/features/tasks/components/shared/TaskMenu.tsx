@@ -1,4 +1,3 @@
-import React from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import type { CSSProperties } from '../../../../types'
 
@@ -10,7 +9,7 @@ interface TaskMenuProps {
 
 const TaskMenu = ({ setIsMenuOpen, onEdit, onDelete }: TaskMenuProps): JSX.Element => {
   return (
-    <div style={styles.menu}>
+    <div style={styles.menu} data-testid="task-menu" >
       <div style={styles.menuItem} onClick={onEdit}>
         <span className="material-icons">edit</span>Edit
       </div>
@@ -22,7 +21,8 @@ const TaskMenu = ({ setIsMenuOpen, onEdit, onDelete }: TaskMenuProps): JSX.Eleme
         style={styles.closeIcon}
         onClick={(): void => {
           setIsMenuOpen(false)
-        }}
+        }} 
+        data-testid="delete-button"
       >
         close
       </span>

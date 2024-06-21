@@ -1,6 +1,5 @@
-import React from 'react';
-import type { CSSProperties, Dispatch, SetStateAction } from 'react';
-import type { Task } from '../../../../types';
+import { Dispatch, SetStateAction } from 'react';
+import { CSSProperties, Task } from '../../../../types';
 import TaskForm from './TaskForm';
 
 interface TaskModalProps {
@@ -20,16 +19,20 @@ const TaskModal = ({
   task,
   onSave,
 }: TaskModalProps): JSX.Element => {
+  const handleSave = (updatedTask: Partial<Task>): void => {
+    onSave(updatedTask); // Memanggil fungsi onSave yang diteruskan dari props
+    setIsModalOpen(false); // Menutup modal setelah menyimpan task
+  };
+
   return (
-    <div style={styles.container}>
+    <div style={styles.container} data-testid="task-modal">
       <div style={styles.modalTop}>
         <h1>{headingTitle}</h1>
         <span
           className="material-icons"
           style={styles.icon}
-          onClick={(): void => {
-            setIsModalOpen(false);
-          }}
+          onClick={() => setIsModalOpen(false)}
+          data-testid="close-modal-button"
         >
           close
         </span>
@@ -39,7 +42,7 @@ const TaskModal = ({
         defaultProgressOrder={defaultProgressOrder}
         setIsModalOpen={setIsModalOpen}
         task={task}
-        onSave={onSave}
+        onSave={handleSave} // Menggunakan fungsi handleSave untuk menyimpan task
       />
     </div>
   );

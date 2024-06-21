@@ -1,30 +1,35 @@
-import { useRecoilValue } from 'recoil'
-import { tasksState } from '../../TaskAtoms'
-import TaskListItem from './TaskListItem'
-import type { Task, CSSProperties } from '../../../../types'
-import React, { useState } from 'react' // useState ditambahkan
-import TaskModal from '../shared/TaskModal' // Ditambahkan
-import { TASK_MODAL_TYPE, TASK_PROGRESS_ID } from '../../../../constants/app' // Ditambahkan
+import { useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { tasksState } from '../../TaskAtoms';
+import TaskListItem from './TaskListItem';
+import type { Task, CSSProperties } from '../../../../types';
+import { TASK_PROGRESS_ID, TASK_MODAL_TYPE } from '../../../../constants/app';
+import TaskModal from '../shared/TaskModal';
 
 const TaskList = (): JSX.Element => {
-  const tasks: Task[] = useRecoilValue(tasksState)
+  const tasks: Task[] = useRecoilValue(tasksState);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-    // Ditambahkan
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false) 
-
-
+  const handleSaveTask = (newTask: Partial<Task>): void => {
+    // Implement your save logic here
+    console.log(newTask);
+    setIsModalOpen(false);
+  };
 
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>Your Tasks</h1>
       <div style={styles.taskButtons}>
         <button
-            style={styles.button}
-            onClick={(): void => {
-              setIsModalOpen(true) // Ditambahkan
-            }}>
-            <span className="material-icons">add</span>Add task
+          style={styles.button}
+          onClick={(): void => {
+            setIsModalOpen(true);
+          }}
+          data-testid="add-task-button"
+        >
+          <span className="material-icons">add</span>Add task
         </button>
+
         <button style={styles.button}>
           <span className="material-icons">sort</span>Filter tasks
         </button>
@@ -37,7 +42,7 @@ const TaskList = (): JSX.Element => {
           <div style={styles.tableHeaderProgress}>Progress</div>
         </div>
         {tasks.map((task: Task) => {
-          return <TaskListItem task={task} key={task.id} />
+          return <TaskListItem task={task} key={task.id} />;
         })}
       </div>
       {isModalOpen && (
@@ -45,11 +50,13 @@ const TaskList = (): JSX.Element => {
           headingTitle="Add your task"
           setIsModalOpen={setIsModalOpen}
           defaultProgressOrder={TASK_PROGRESS_ID.NOT_STARTED}
+          type={TASK_MODAL_TYPE.ADD}
+          onSave={handleSaveTask}
         />
       )}
     </div>
-  )
-}
+  );
+};
 
 const styles: CSSProperties = {
   container: {
@@ -93,6 +100,6 @@ const styles: CSSProperties = {
     padding: '16px',
     width: '15%',
   },
-}
+};
 
-export default TaskList
+export default TaskList;

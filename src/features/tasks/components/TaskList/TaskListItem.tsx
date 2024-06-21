@@ -40,16 +40,12 @@ interface TaskListItemProps {
 }
 
 const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
-  const { completeTask, moveTaskCard, deleteTask, editTask } = useTasksAction();
+  const { completeTask, deleteTask, editTask } = useTasksAction();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
   const handleCompleteTask = () => {
     completeTask(task.id); // Memanggil completeTask saat ikon task selesai diklik
-  };
-
-  const handleMenuOpen = () => {
-    setIsMenuOpen(true); // Mengatur isMenuOpen menjadi true saat ikon menu diklik
   };
 
   const handleEdit = (): void => {
@@ -67,7 +63,7 @@ const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
   };
 
   return (
-    <div style={styles.tableBody}>
+    <div style={styles.tableBody} data-testid="task-list-item">
       <div style={styles.tableBodyTaskTitle}>
         <span
           className="material-icons"
@@ -87,7 +83,7 @@ const TaskListItem = ({ task }: TaskListItemProps): JSX.Element => {
         <span
         className="material-icons"
         style={styles.menuIcon}
-        onClick={(): void => setIsMenuOpen(true)}
+        onClick={(): void => setIsMenuOpen(true)} data-testid="task-menu-button"
       >
           more_horiz
         </span>

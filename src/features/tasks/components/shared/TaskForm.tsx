@@ -1,26 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import {
   TASK_PROGRESS_ID,
   TASK_PROGRESS_STATUS,
   TASK_MODAL_TYPE,
 } from '../../../../constants/app';
-import type { CSSProperties } from '../../../../types';
-import type { Dispatch, SetStateAction } from 'react';
+import type { CSSProperties, Task } from '../../../../types';
 import { useTasksAction } from '../hooks/Tasks';
-import type { Task } from '../../../../types';
 
 interface TaskFormProps {
   type: string;
   defaultProgressOrder: number;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
   task?: Task; // optional task for editing
+  onSave: (updatedTask: Partial<Task>) => void; // Function to handle save
 }
 
-const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen, task }: TaskFormProps): JSX.Element => {
+const TaskForm = ({
+  type,
+  defaultProgressOrder,
+  setIsModalOpen,
+  task,
+  onSave,
+}: TaskFormProps): JSX.Element => {
   const [title, setTitle] = useState<string>(task?.title || '');
   const [detail, setDetail] = useState<string>(task?.detail || '');
   const [dueDate, setDueDate] = useState<string>(task?.dueDate || '');
-  const [progressOrder, setProgressOrder] = useState<number>(task?.progressOrder || defaultProgressOrder);
+  const [progressOrder, setProgressOrder] = useState<number>(
+    task?.progressOrder || defaultProgressOrder
+  );
 
   const { addTask, editTask } = useTasksAction();
 
@@ -34,19 +41,29 @@ const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen, task }: TaskForm
   }, [task, defaultProgressOrder]);
 
   const handleSubmit = (): void => {
+    const updatedTask: Partial<Task> = {
+      title,
+      detail,
+      dueDate,
+      progressOrder,
+    };
+
     if (type === TASK_MODAL_TYPE.ADD) {
       addTask(title, detail, dueDate, progressOrder);
     } else if (type === TASK_MODAL_TYPE.EDIT && task) {
-      editTask(task.id, { title, detail, dueDate, progressOrder });
+      editTask(task.id, updatedTask);
     }
+
+    onSave(updatedTask);
     setIsModalOpen(false);
   };
 
   return (
     <form style={styles.form}>
       <div style={styles.formItem}>
-        <label>Title:</label>
+        <label htmlFor="title">Title:</label>
         <input
+          id="title"
           type="text"
           value={title}
           onChange={(e): void => setTitle(e.target.value)}
@@ -54,16 +71,18 @@ const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen, task }: TaskForm
         />
       </div>
       <div style={styles.formItem}>
-        <label>Detail:</label>
+        <label htmlFor="detail">Detail:</label>
         <textarea
+          id="detail"
           value={detail}
           onChange={(e): void => setDetail(e.target.value)}
           style={styles.formTextArea}
         />
       </div>
       <div style={styles.formItem}>
-        <label>Due Date:</label>
+        <label htmlFor="dueDate">Due Date:</label>
         <input
+          id="dueDate"
           type="date"
           value={dueDate}
           onChange={(e): void => setDueDate(e.target.value)}
@@ -71,8 +90,9 @@ const TaskForm = ({ type, defaultProgressOrder, setIsModalOpen, task }: TaskForm
         />
       </div>
       <div style={styles.formItem}>
-        <label>Progress:</label>
+        <label htmlFor="progress">Progress:</label>
         <select
+          id="progress"
           style={styles.formInput}
           value={progressOrder}
           onChange={(e): void => setProgressOrder(Number(e.target.value))}

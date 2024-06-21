@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import type { Task, CSSProperties } from '../../../../types';
 import { TASK_PROGRESS_ID, TASK_MODAL_TYPE } from '../../../../constants/app';
-import { useTasksAction } from '../hooks/Tasks';
-import TaskMenu from '../shared/TaskMenu';
+import { useTasksAction } from '../../components/hooks/Tasks';
 import TaskModal from '../shared/TaskModal';
+import TaskMenu from '../shared/TaskMenu'; // Pastikan diimpor
 
 interface TaskCardProps {
   task: Task;
@@ -25,7 +25,9 @@ const getIconStyle = (progressOrder: number): React.CSSProperties => {
 
 const getArrowPositionStyle = (progressOrder: number): React.CSSProperties => {
   const justifyContentValue: 'flex-end' | 'space-between' =
-    progressOrder === TASK_PROGRESS_ID.NOT_STARTED ? 'flex-end' : 'space-between';
+    progressOrder === TASK_PROGRESS_ID.NOT_STARTED
+      ? 'flex-end'
+      : 'space-between';
   return {
     display: 'flex',
     justifyContent: justifyContentValue,
@@ -33,9 +35,13 @@ const getArrowPositionStyle = (progressOrder: number): React.CSSProperties => {
 };
 
 const TaskCard = ({ task }: TaskCardProps): JSX.Element => {
-  const { completeTask, moveTaskCard, deleteTask, editTask } = useTasksAction();
+  const { moveTaskCard, completeTask, deleteTask, editTask } = useTasksAction();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+
+  const handleCompleteTask = () => {
+    completeTask(task.id);
+  };
 
   const handleEdit = (): void => {
     setIsEditModalOpen(true);
@@ -57,16 +63,18 @@ const TaskCard = ({ task }: TaskCardProps): JSX.Element => {
         <div
           className="material-icons"
           style={getIconStyle(task.progressOrder)}
-          onClick={(): void => completeTask(task.id)}
+          onClick={handleCompleteTask}
         >
           check_circle
         </div>
-        <div
-          className="material-icons"
-          style={styles.menuIcon}
-          onClick={(): void => setIsMenuOpen(true)}
-        >
-          more_vert
+        <div>
+          <span
+            className="material-icons"
+            style={styles.menuIcon}
+            onClick={(): void => setIsMenuOpen(true)} data-testid="task-menu-button"
+          >
+            more_vert
+          </span>
         </div>
       </div>
       <p style={styles.taskTitle}>{task.title}</p>

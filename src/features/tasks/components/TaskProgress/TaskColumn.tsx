@@ -1,9 +1,10 @@
 // components/TaskColumn.tsx
 import React, { useState } from 'react';
 import TaskCard from './TaskCard';
-import TaskModal from '../shared/TaskModal';
+
 import { TASK_MODAL_TYPE, TASK_PROGRESS_ID } from '../../../../constants/app';
 import type { Task } from '../../../../types';
+import TaskModal from '../shared/TaskModal';
 
 interface TaskColumnProps {
   columnTitle: string;

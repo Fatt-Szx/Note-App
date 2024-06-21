@@ -1,4 +1,3 @@
-import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { notStartedTasksSelector,inProgressTasksSelector,waitingTasksSelector,completedTasksSelector,} from '../../TaskSelectors'
 import TaskColumn from './TaskColumn'

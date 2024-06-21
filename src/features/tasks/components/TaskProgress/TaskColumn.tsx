@@ -1,8 +1,6 @@
-// components/TaskColumn.tsx
 import React, { useState } from 'react';
 import TaskCard from './TaskCard';
-
-import { TASK_MODAL_TYPE, TASK_PROGRESS_ID } from '../../../../constants/app';
+import { TASK_MODAL_TYPE } from '../../../../constants/app';
 import type { Task } from '../../../../types';
 import TaskModal from '../shared/TaskModal';
 
@@ -17,6 +15,13 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ columnTitle, tasks, progressOrd
 
   const handleOpenModal = (): void => {
     setIsModalOpen(true);
+  };
+
+  const handleSaveTask = (newTask: Partial<Task>): void => {
+    // Tambahkan logika untuk menyimpan tugas baru di sini
+    // Misalnya, Anda dapat memanggil fungsi dari konteks atau mengupdate state
+    console.log('Task saved:', newTask);
+    setIsModalOpen(false);
   };
 
   return (
@@ -37,7 +42,8 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ columnTitle, tasks, progressOrd
           headingTitle={`Add ${columnTitle} Task`}
           type={TASK_MODAL_TYPE.ADD}
           setIsModalOpen={setIsModalOpen}
-          defaultProgressOrder={TASK_PROGRESS_ID.NOT_STARTED}
+          defaultProgressOrder={progressOrder} // Menggunakan progressOrder
+          onSave={handleSaveTask} // Tambahkan properti onSave di sini
         />
       )}
     </div>
